@@ -17,7 +17,7 @@ import { trolyIcon, userIcon } from '../Assets';
 
 export default function Header() {
    return (
-      <Flex boxShadow='lg' padding={'20px 120px 20px 120px'} bg='white' alignItems={'center'} justifyContent={'space-between'}>
+      <Flex width={'100%'} position={'fixed'} boxShadow='lg' padding={'20px 120px 20px 120px'} bg='white' alignItems={'center'} justifyContent={'space-between'}>
          <InputGroup width={'70%'} marginRight={'24px'}>
             <Input type='text' placeholder='Search product...' />
             <InputRightAddon children={<Search2Icon w={4} h={4} />} />
