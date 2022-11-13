@@ -20,16 +20,13 @@ import { setDataProduct } from '../../Config/Actions';
 
 export default function HomeScreen() {
    const [sliderRef, setSliderRef] = useState(null)
-
-   
    const dataProduct = useSelector((state) => state.product.data)
    const dispatch = useDispatch()
    
    useEffect(() => {
-      console.log('=== redux ===', dataProduct);
+      // fetch data api here
    }, [dataProduct])
    
-
    const carouselSetting = {
       speed: 600,
       lazyLoad: true,
