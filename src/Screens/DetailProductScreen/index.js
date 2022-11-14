@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useLocation } from "react-router-dom";
+import { useSelector } from 'react-redux';
 // COMPONENTS
 import CHeader from '../../Components/CHeader';
 // CHAKRA UI COMPONENTS
@@ -19,7 +20,7 @@ import {
    Input,
    useNumberInput
 } from '@chakra-ui/react';
-import { shoesImage } from '../../Assets'
+import { shoes01, shoes02, shoes03, shoes04, shoes05, shoes06 } from '../../Assets'
 
 function useQuery() {
    const { search } = useLocation();
@@ -27,20 +28,70 @@ function useQuery() {
 }
 
 export default function DetailProduct() {
-   let query = useQuery();
-   let id = Number(query.get('id'));
+   const dataProduct = useSelector((state) => state.product.data);
+   const query = useQuery();
+   const id = Number(query.get('id'));
+
+   const dataDetailFilter = dataProduct.filter((value) => {
+      if (value.id === id) return value;
+   });
+
+   const dataFilter = dataDetailFilter && dataDetailFilter[0];
+   const { category, color, condition, discount, image, material, stock, title, weight } = dataFilter;
+   const originalPrice = Object.values(dataFilter)[5];
+   const priceValue = Object.values(dataFilter)[3];
+   const [totalPrice, setTotalPrice] = useState(priceValue);
 
    const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
       useNumberInput({
          step: 1,
          defaultValue: 1,
          min: 1,
-         max: 9,
-      })
+         max: Number(stock),
+         onChange: (number) => countPrice(number)
+      });
 
-   const inc = getIncrementButtonProps()
-   const dec = getDecrementButtonProps()
-   const input = getInputProps()
+   const countPrice = (number) => {
+      const sum = priceValue * number;
+      setTotalPrice(sum);
+   }
+
+   const rupiah = (number) => {
+      return new Intl.NumberFormat("id-ID", {
+         style: "currency",
+         currency: "IDR"
+      }).format(number);
+   }
+
+   const inc = getIncrementButtonProps();
+   const dec = getDecrementButtonProps();
+   const input = getInputProps();
+   const imageSlice = image.slice(0, -4).toUpperCase();
+   let imageIcon;
+
+   switch (imageSlice) {
+      case 'SHOES-1':
+         imageIcon = shoes01
+         break;
+      case 'SHOES-2':
+         imageIcon = shoes02
+         break;
+      case 'SHOES-3':
+         imageIcon = shoes03
+         break;
+      case 'SHOES-4':
+         imageIcon = shoes04
+         break;
+      case 'SHOES-5':
+         imageIcon = shoes05
+         break;
+      case 'SHOES-6':
+         imageIcon = shoes06
+         break;
+      default:
+         imageIcon = shoes01
+         break;
+   }
 
    return (
       <React.Fragment>
@@ -48,16 +99,16 @@ export default function DetailProduct() {
          {/** Content Product Detail */}
          <Flex padding={'134px 120px 34px 120px'} justifyContent={'space-between'}>
             {/** Image Product Section */}
-            <Image src={shoesImage} alt='shoes' h={'400px'} w={'300px'} objectFit={'cover'} rounded={'2xl'} />
+            <Image src={imageIcon} alt='shoes' h={'400px'} w={'300px'} objectFit={'cover'} rounded={'2xl'} />
             <Box flex={2} marginLeft={'36px'}>
                {/** Product Price Section */}
-               <Text fontSize={'28px'} fontWeight={'bold'} lineHeight={'32px'}>Sepatu pria sepatu murah sneakers sepatu kets nike berwarna hijau</Text>
-               <Text fontSize={'32px'} fontWeight={'bold'} marginTop={'18px'}>Rp. 0</Text>
+               <Text fontSize={'28px'} fontWeight={'bold'} lineHeight={'32px'}>{title}</Text>
+               <Text fontSize={'32px'} fontWeight={'bold'} marginTop={'18px'}>{rupiah(priceValue)}</Text>
                <Flex alignItems={'center'} marginBottom={'24px'} marginTop={'6px'}>
                   <Box background={'pink'} rounded='md' padding={'6px'} marginRight={'8px'}>
-                     <Text>100%</Text>
+                     <Text>{discount.includes('%') ? discount : `${discount}%`}</Text>
                   </Box>
-                  <Text>Rp. 500.000</Text>
+                  <Text textDecorationLine={'line-through'}>{rupiah(originalPrice)}</Text>
                </Flex>
                <Divider borderWidth={1.2} />
                {/** Tab & Product Detail Section */}
@@ -71,26 +122,26 @@ export default function DetailProduct() {
                      <TabPanel>
                         <Flex>
                            <Text>Kondisi:</Text>
-                           <Text fontWeight={'bold'} marginLeft={'4px'}>Baru</Text>
+                           <Text fontWeight={'bold'} marginLeft={'4px'}>{condition}</Text>
                         </Flex>
                         <Flex>
                            <Text>Berat Satuan:</Text>
-                           <Text fontWeight={'bold'} marginLeft={'4px'}>200 Gram</Text>
+                           <Text fontWeight={'bold'} marginLeft={'4px'}>{weight}</Text>
                         </Flex>
                         <Flex>
                            <Text>Kategori:</Text>
-                           <Text fontWeight={'bold'} marginLeft={'4px'}>Sepatu Pria</Text>
+                           <Text fontWeight={'bold'} marginLeft={'4px'}>{category}</Text>
                         </Flex>
                      </TabPanel>
                      <TabPanel>
                         <Text fontWeight={'bold'}>Info Product</Text>
                         <Flex>
                            <Text>Bahan:</Text>
-                           <Text marginLeft={'4px'}>100% Rubber</Text>
+                           <Text marginLeft={'4px'}>{material}</Text>
                         </Flex>
                         <Flex>
                            <Text>Warna:</Text>
-                           <Text marginLeft={'4px'}>Hijau</Text>
+                           <Text marginLeft={'4px'}>{color}</Text>
                         </Flex>
                      </TabPanel>
                   </TabPanels>
@@ -109,15 +160,15 @@ export default function DetailProduct() {
                      </HStack>
                      <Flex marginLeft={'18px'}>
                         <Text>Stok Total:</Text>
-                        <Text fontWeight={'bold'} marginLeft={'4px'} color={'orange'}>Sisa 1</Text>
+                        <Text fontWeight={'bold'} marginLeft={'4px'} color={'orange'}>{`Sisa ${stock}`}</Text>
                      </Flex>
                   </Flex>
                   <Flex justifyContent={'flex-end'} marginTop={'8px'}>
-                     <Text>Rp. 69.000</Text>
+                     <Text>{rupiah(priceValue)}</Text>
                   </Flex>
                   <Flex justifyContent={'space-between'} marginTop={'8px'} marginBottom={'24px'}>
                      <Text>Subtotal</Text>
-                     <Text fontWeight={'bold'}>Rp. 0</Text>
+                     <Text fontWeight={'bold'}>{rupiah(totalPrice)}</Text>
                   </Flex>
                   <Button width={'100%'} colorScheme={'green'}>Beli</Button>
                </Box>
