@@ -1,4 +1,4 @@
-# Frontend Developer Assignment Test | Global Urban Esential
+# Frontend React Developer Test | Global Urban Esential
 
 ## Table of Contents
 
